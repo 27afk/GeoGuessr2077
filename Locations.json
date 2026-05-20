@@ -1,0 +1,12 @@
+[
+  { "name": "Location1", "x": 728, "y": 360 },
+  { "name": "Location2", "x": 150, "y": 40 },
+  { "name": "Location3", "x": 512, "y": 200 },
+  { "name": "Location4", "x": 340, "y": 410 },
+  { "name": "Location5", "x": 890, "y": 120 },
+  { "name": "Location6", "x": 210, "y": 600 },
+  { "name": "Location7", "x": 450, "y": 310 },
+  { "name": "Location8", "x": 670, "y": 180 },
+  { "name": "Location9", "x": 120, "y": 520 },
+  { "name": "Location10", "x": 930, "y": 440 }
+]

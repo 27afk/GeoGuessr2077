@@ -3,6 +3,11 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections; // Added for shuffling
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GeoGame extends JFrame {
     private CardLayout cardLayout = new CardLayout();
@@ -22,9 +27,8 @@ public class GeoGame extends JFrame {
         setSize(1000, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        // UPDATED: Points to "Location1" (matches your png name)
-        levelList.add(new Location("Location1", 728, 360)); 
-        levelList.add(new Location("Location2", 150, 40));
+        // Load all 10 locations from your JSON config
+        loadLocationsFromJson("Locations.json");
 
         setupMenu();
         setupGameScreen();
@@ -32,6 +36,33 @@ public class GeoGame extends JFrame {
 
         add(mainContainer);
         setLocationRelativeTo(null);
+    }
+
+    private void loadLocationsFromJson(String filePath) {
+        StringBuilder jsonContent = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                jsonContent.append(line);
+            }
+            
+            // Regex to parse the JSON objects cleanly without external library jars
+            Pattern pattern = Pattern.compile("\\{\\s*\"name\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"x\"\\s*:\\s*(\\d+)\\s*,\\s*\"y\"\\s*:\\s*(\\d+)\\s\\}");
+            Matcher matcher = pattern.matcher(jsonContent.toString());
+            
+            while (matcher.find()) {
+                String name = matcher.group(1);
+                int x = Integer.parseInt(matcher.group(2));
+                int y = Integer.parseInt(matcher.group(3));
+                levelList.add(new Location(name, x, y));
+            }
+            System.out.println("Loaded " + levelList.size() + " positions from " + filePath);
+            
+        } catch (Exception e) {
+            System.err.println("Could not read JSON file, loading hardcoded fallback locations: " + e.getMessage());
+            levelList.add(new Location("Location1", 728, 360)); 
+            levelList.add(new Location("Location2", 150, 40));
+        }
     }
 
     private void setupMenu() {
@@ -60,7 +91,6 @@ public class GeoGame extends JFrame {
         JButton left = new JButton("<< Pan Left");
         JButton right = new JButton("Pan Right >>");
 
-        // SMOOTH MOVEMENT: Hold button to slide
         Timer panTimer = new Timer(15, null);
         
         left.addMouseListener(new MouseAdapter() {
@@ -137,13 +167,16 @@ public class GeoGame extends JFrame {
     private void startGame() {
         currentRound = 0;
         totalScore = 0;
+        
+        // Randomizes the order of the locations loaded from your JSON file
+        Collections.shuffle(levelList);
+        
         loadRound();
         cardLayout.show(mainContainer, "GAME");
     }
 
     private void loadRound() {
         currentLoc = levelList.get(currentRound);
-        // UPDATED: Looks inside "Pictures" folder and adds ".png" extension
         panoramaDisplay.setImage("Pictures/" + currentLoc.imgPrefix + ".png");
     }
 
@@ -186,18 +219,16 @@ class PanoramaPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (img == null || img.getWidth(null) <= 0) {
-            g.drawString("Loading Pictures/" + "Location1.png...", 20, 20);
+            g.drawString("Loading image assets...", 20, 20);
             return;
         }
 
         Graphics2D g2d = (Graphics2D) g;
-        // High quality rendering for Cyberpunk neon
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         int imgWidth = img.getWidth(null);
         int panelHeight = getHeight();
 
-        // Drawing two copies for seamless loop
         g2d.drawImage(img, -scrollOffset, 0, imgWidth, panelHeight, null);
         g2d.drawImage(img, imgWidth - scrollOffset, 0, imgWidth, panelHeight, null);
     }
