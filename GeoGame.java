@@ -1,3 +1,10 @@
+/*
+location 1
+location 2 kabuki centrtal
+location 3 jig jig street    
+*/
+
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -10,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GeoGame extends JFrame {
-    private CardLayout cardLayout = new CardLayout();
+    private CardLayout cardLayout = new CardLayout();  
     private JPanel mainContainer = new JPanel(cardLayout);
     
     private int currentRound = 0;
