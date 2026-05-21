@@ -184,7 +184,7 @@ public class GeoGame extends JFrame {
 
     private void loadRound() {
         currentLoc = levelList.get(currentRound);
-        panoramaDisplay.setImage("Pictures/" + currentLoc.imgPrefix + ".png");
+        panoramaDisplay.setImage("imagesyay/" + currentLoc.imgPrefix + ".png");
     }
 
     private void handleGuess(int x, int y) {
